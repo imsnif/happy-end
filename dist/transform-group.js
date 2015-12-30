@@ -30,16 +30,22 @@ function finished(resolve, reject) {
   this.on("done", function () {
     activeStreams -= 1;
     if (activeStreams < 0) reject("Multiple end/flush events on one or more streams.");
-    if (activeStreams === 0) {
-      resolve(streamCount);
-    }
+    if (activeStreams === 0) resolve(streamCount);
+  });
+  this.on("error", function (error) {
+    reject(error);
   });
 }
 
 function catchEnding(streamObj) {
   var event = "";
-  if (streamObj instanceof _stream2.default.Readable) event = "end";
-  if (streamObj instanceof _stream2.default.Writable) event = "finish";
+  if (typeof streamObj._events.end !== "undefined") {
+    event = "end";
+  } else if (typeof streamObj._events.finish !== "undefined") {
+    event = "finish";
+  } else {
+    throw new Error("Unidentified stream type");
+  }
   streamObj.on(event, this.emit.bind(this, "done"));
 }
 
@@ -60,10 +66,17 @@ var TransformGroup = (function (_EventEmitter) {
     value: function add(streams) {
       var _this2 = this;
 
-      streams.forEach(function (streamObj) {
-        _this2.emit("added");
-        catchEnding.call(_this2, streamObj);
-      });
+      if (Array.isArray(streams)) {
+        streams.forEach(function (streamObj) {
+          _this2.emit("added");
+          catchEnding.call(_this2, streamObj);
+          streamObj.on("error", _this2.emit.bind(_this2, "error"));
+        });
+      } else {
+        this.emit("added");
+        catchEnding.call(this, streams);
+        streams.on("error", this.emit.bind(this, "error"));
+      }
       return this._finished;
     }
   }]);
