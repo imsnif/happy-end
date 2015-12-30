@@ -27,23 +27,17 @@ test('write stream group', function (t) {
   t.plan(1)
   let tgroup = new TransformGroup()
   let streams = [
-    fs.createWriteStream(`${__dirname}/lib/temp1`),
-    fs.createWriteStream(`${__dirname}/lib/temp1`)
+    fs.createWriteStream(`${__dirname}/lib/temp`),
+    fs.createWriteStream(`${__dirname}/lib/temp`)
   ]
   streams.forEach((stream) => {
     fs.createReadStream(`${__dirname}/lib/sample1.txt`).pipe(stream)
   })
   let finished = tgroup.add(streams)
   finished.then((number) => {
-    fs.unlink(`${__dirname}/lib/temp1`, (err) => {
-      if (err) t.fail(err)
-      t.equal(2, number)
-    })
+    t.equal(2, number)
   }).catch((reason) => {
-    fs.unlink(`${__dirname}/lib/temp1`, (err) => {
-      if (err) t.fail(err)
-      t.fail(reason)
-    })
+    t.fail(reason)
   })
 })
 
@@ -65,15 +59,9 @@ test('transform stream group', function (t) {
   })
   let finished = tgroup.add(streams)
   finished.then((number) => {
-    fs.unlink(`${__dirname}/lib/temp`, (err) => {
-      if (err) t.fail(err)
-      t.equal(2, number)
-    })
+    t.equal(2, number)
   }).catch((reason) => {
-    fs.unlink(`${__dirname}/lib/temp`, (err) => {
-      if (err) t.fail(err)
-      t.fail(reason)
-    })
+    t.fail(reason)
   })
 })
 
@@ -89,15 +77,9 @@ test('mixed group', function (t) {
   read.pipe(transform).pipe(write)
   let finished = tgroup.add([read, transform, write])
   finished.then((number) => {
-    fs.unlink(`${__dirname}/lib/temp`, (err) => {
-      if (err) t.fail(err)
-      t.equal(3, number)
-    })
+    t.equal(3, number)
   }).catch((reason) => {
-    fs.unlink(`${__dirname}/lib/temp`, (err) => {
-      if (err) t.fail(err)
-      t.fail(reason)
-    })
+    t.fail(reason)
   })
 })
 
@@ -118,13 +100,9 @@ test('error', function (t) {
   })
   let finished = tgroup.add(streams)
   finished.then((number) => {
-    fs.unlink(`${__dirname}/lib/temp`, (err) => {
-      t.fail("Did not receive error")
-    })
+    t.fail("Did not receive error")
   }).catch((reason) => {
-    fs.unlink(`${__dirname}/lib/temp`, (err) => {
-      t.equal(reason, "I have erred!")
-    })
+    t.equal(reason, "I have erred!")
   })
 })
 
@@ -153,4 +131,8 @@ test('multiple adds and promises', function (t) {
   [ promise1, promise2, promise3].forEach((promise) => {
     promise.then(resolved).catch(rejected)
   })
+})
+
+test.onFinish(() => {
+  fs.unlink(`${__dirname}/lib/temp`)
 })
