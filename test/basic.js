@@ -1,4 +1,4 @@
-import TransformGroup from '../index.js';
+import HappyEnd from '../index.js';
 
 import fs             from 'fs'
 import test           from 'tape'
@@ -7,7 +7,7 @@ import through        from 'through2'
 
 test('read stream group', function (t) {
   t.plan(1)
-  let tgroup = new TransformGroup()
+  let group = new HappyEnd()
   let streams = [
     fs.createReadStream(`${__dirname}/lib/sample1.txt`),
     fs.createReadStream(`${__dirname}/lib/sample2.txt`),
@@ -15,7 +15,7 @@ test('read stream group', function (t) {
   streams.forEach((stream) => {
     stream.pipe(new DevNullStream())
   })
-  let finished = tgroup.add(streams)
+  let finished = group.add(streams)
   finished.then((number) => {
     t.equal(2, number)
   }).catch((reason) => {
@@ -25,7 +25,7 @@ test('read stream group', function (t) {
 
 test('write stream group', function (t) {
   t.plan(1)
-  let tgroup = new TransformGroup()
+  let group = new HappyEnd()
   let streams = [
     fs.createWriteStream(`${__dirname}/lib/temp`),
     fs.createWriteStream(`${__dirname}/lib/temp`)
@@ -33,7 +33,7 @@ test('write stream group', function (t) {
   streams.forEach((stream) => {
     fs.createReadStream(`${__dirname}/lib/sample1.txt`).pipe(stream)
   })
-  let finished = tgroup.add(streams)
+  let finished = group.add(streams)
   finished.then((number) => {
     t.equal(2, number)
   }).catch((reason) => {
@@ -47,7 +47,7 @@ test('transform stream group', function (t) {
     this.push(buf)
     cb()
   }
-  let tgroup = new TransformGroup()
+  let group = new HappyEnd()
   let streams = [
     through(push),
     through(push)
@@ -57,7 +57,7 @@ test('transform stream group', function (t) {
       .pipe(stream)
       .pipe(fs.createWriteStream(`${__dirname}/lib/temp`))
   })
-  let finished = tgroup.add(streams)
+  let finished = group.add(streams)
   finished.then((number) => {
     t.equal(2, number)
   }).catch((reason) => {
@@ -73,9 +73,9 @@ test('mixed group', function (t) {
     cb()
   })
   let write = fs.createWriteStream(`${__dirname}/lib/temp`)
-  let tgroup = new TransformGroup()
+  let group = new HappyEnd()
   read.pipe(transform).pipe(write)
-  let finished = tgroup.add([read, transform, write])
+  let finished = group.add([read, transform, write])
   finished.then((number) => {
     t.equal(3, number)
   }).catch((reason) => {
@@ -88,7 +88,7 @@ test('error', function (t) {
   function push (buf, enc, cb) {
     cb("I have erred!")
   }
-  let tgroup = new TransformGroup()
+  let group = new HappyEnd()
   let streams = [
     through(push),
     through(push)
@@ -98,7 +98,7 @@ test('error', function (t) {
       .pipe(stream)
       .pipe(fs.createWriteStream(`${__dirname}/lib/temp`))
   })
-  let finished = tgroup.add(streams)
+  let finished = group.add(streams)
   finished.then((number) => {
     t.fail("Did not receive error")
   }).catch((reason) => {
@@ -119,13 +119,13 @@ test('multiple adds and promises', function (t) {
     cb()
   }
 
-  let tgroup   = new TransformGroup()
+  let group   = new HappyEnd()
   let stream1  = fs.createReadStream(`${__dirname}/lib/sample1.txt`)
-  let promise1 = tgroup.add(stream1)
+  let promise1 = group.add(stream1)
   let stream2  = through(push)
-  let promise2 = tgroup.add(stream2)
+  let promise2 = group.add(stream2)
   let stream3  = fs.createWriteStream(`${__dirname}/lib/temp`)
-  let promise3 = tgroup.add(stream3)
+  let promise3 = group.add(stream3)
 
   stream1.pipe(stream2).pipe(stream3);
   [ promise1, promise2, promise3].forEach((promise) => {

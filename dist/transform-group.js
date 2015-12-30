@@ -49,19 +49,19 @@ function catchEnding(streamObj) {
   streamObj.on(event, this.emit.bind(this, "done"));
 }
 
-var TransformGroup = (function (_EventEmitter) {
-  _inherits(TransformGroup, _EventEmitter);
+var HappyEnd = (function (_EventEmitter) {
+  _inherits(HappyEnd, _EventEmitter);
 
-  function TransformGroup() {
-    _classCallCheck(this, TransformGroup);
+  function HappyEnd() {
+    _classCallCheck(this, HappyEnd);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TransformGroup).call(this));
+    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(HappyEnd).call(this));
 
     _this._finished = new Promise(finished.bind(_this));
     return _this;
   }
 
-  _createClass(TransformGroup, [{
+  _createClass(HappyEnd, [{
     key: 'add',
     value: function add(streams) {
       var _this2 = this;
@@ -81,7 +81,7 @@ var TransformGroup = (function (_EventEmitter) {
     }
   }]);
 
-  return TransformGroup;
+  return HappyEnd;
 })(_events.EventEmitter);
 
-exports.default = TransformGroup;
+exports.default = HappyEnd;
