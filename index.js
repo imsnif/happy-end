@@ -1,1 +1,1 @@
-module.exports = require("./dist/transform-group.js")
+module.exports = require("./dist/group.js")
