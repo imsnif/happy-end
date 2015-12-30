@@ -6,7 +6,9 @@ This helps in situations where you want to trigger an action only after a few di
 
 Example:
 ```javascript
-  import HappyEnd from 'happy-end'
+  import HappyEnd      from 'happy-end'
+  import DevNullStream from 'dev-null-stream'
+  import fs            from 'fs'
   
   let group = new HappyEnd()
   let streams = [ 
