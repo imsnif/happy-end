@@ -1,7 +1,7 @@
 {
-  "name": "transform-group",
+  "name": "happy-end",
   "version": "0.0.1",
-  "description": "Creates streams that trigger a callback once all are flushed.",
+  "description": "Creates a group of streams that will end together",
   "main": "index.js",
   "scripts": {
     "build": "babel ./lib -d dist",
