@@ -66,6 +66,7 @@ var HappyEnd = (function (_EventEmitter) {
     value: function add(streams) {
       var _this2 = this;
 
+      if (!streams) return;
       if (Array.isArray(streams)) {
         streams.forEach(function (streamObj) {
           _this2.emit("added");
